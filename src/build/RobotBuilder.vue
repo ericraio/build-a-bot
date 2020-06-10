@@ -1,8 +1,13 @@
 <template>
-  <div>
+  <div class="content">
+    <button class="add-to-cart" @click="addToCart()">Add to Cart</button>
     <div class="top-row">
       <div class="top part">
-        <div class="robot-name">{{ selectedRobot.head.title }}</div>
+        <div class="robot-name">
+          {{ selectedRobot.head.title }}
+          <!-- v-if removes the element from the dom, v-show just styles display none -->
+          <span class="sale" v-if="selectedRobot.head.onSale">Sale!</span>
+        </div>
         <img :src="selectedRobot.head.src" title="head" />
         <button @click="selectPreviousHead()" class="prev-selector">
           &#9668;
@@ -23,7 +28,7 @@
         </button>
       </div>
       <div class="center part">
-        <img :src="selectedRobot.toroso.src" title="torso" />
+        <img :src="selectedRobot.torso.src" title="torso" />
         <button @click="selectPreviousTorso()" class="prev-selector">
           &#9668;
         </button>
@@ -52,6 +57,23 @@
         </button>
       </div>
     </div>
+    <div>
+      <h1>Cart</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>Robot</th>
+            <th class="cost">Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(robot, index) in cart" :key="index">
+            <td>{{ robot.head.title }}</td>
+            <td class="cost">{{ robot.cost }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -73,7 +95,10 @@ function getNextValidIndex(index, length) {
 export default {
   name: 'RobotBuilder',
   data() {
+    // Vue's change detection works by hooking into the getters and setters. All
+    // variables must be declared in data first.
     return {
+      cart: [],
       availableParts,
       selectedHeadIndex: 0,
       selectedLeftArmIndex: 0,
@@ -94,74 +119,52 @@ export default {
     },
   },
   methods: {
+    addToCart() {
+      const robot = this.selectedRobot;
+
+      const cost = robot.head.cost + robot.leftArm.cost + robot.torso.cost + robot.rightArm.cost + robot.base.cost;
+
+      this.cart.push({ ...robot, cost });
+    },
+
     selectNextHead() {
-      this.selectedHeadIndex = getNextValidIndex(
-        this.selectedHeadIndex,
-        availableParts.heads.length,
-      );
+      this.selectedHeadIndex = getNextValidIndex(this.selectedHeadIndex, availableParts.heads.length);
     },
 
     selectPreviousHead() {
-      this.selectedHeadIndex = getPreviousValidIndex(
-        this.selectedHeadIndex,
-        availableParts.heads.length,
-      );
+      this.selectedHeadIndex = getPreviousValidIndex(this.selectedHeadIndex, availableParts.heads.length);
     },
 
     selectNextLeftArm() {
-      this.selectedLeftArmIndex = getNextValidIndex(
-        this.selectedLeftArmIndex,
-        availableParts.arms.length,
-      );
+      this.selectedLeftArmIndex = getNextValidIndex(this.selectedLeftArmIndex, availableParts.arms.length);
     },
 
     selectPreviousLeftArm() {
-      this.selectedLeftArmIndex = getPreviousValidIndex(
-        this.selectedLeftArmIndex,
-        availableParts.arms.length,
-      );
+      this.selectedLeftArmIndex = getPreviousValidIndex(this.selectedLeftArmIndex, availableParts.arms.length);
     },
 
     selectNextRightArm() {
-      this.selectedRightArmIndex = getNextValidIndex(
-        this.selectedRightArmIndex,
-        availableParts.arms.length,
-      );
+      this.selectedRightArmIndex = getNextValidIndex(this.selectedRightArmIndex, availableParts.arms.length);
     },
 
     selectPreviousRightArm() {
-      this.selectedRightArmrIndex = getPreviousValidIndex(
-        this.selectedRightArmIndex,
-        availableParts.heads.length,
-      );
+      this.selectedRightArmIndex = getPreviousValidIndex(this.selectedRightArmIndex, availableParts.heads.length);
     },
 
     selectNextTorso() {
-      this.selectedTorsoIndex = getNextValidIndex(
-        this.selectedTorsoIndex,
-        availableParts.torsos.length,
-      );
+      this.selectedTorsoIndex = getNextValidIndex(this.selectedTorsoIndex, availableParts.torsos.length);
     },
 
     selectPreviousTorso() {
-      this.selectedTorsoIndex = getPreviousValidIndex(
-        this.selectedTorsoIndex,
-        availableParts.torsos.length,
-      );
+      this.selectedTorsoIndex = getPreviousValidIndex(this.selectedTorsoIndex, availableParts.torsos.length);
     },
 
     selectNextBase() {
-      this.selectedBaseIndex = getNextValidIndex(
-        this.selectedBaseIndex,
-        availableParts.bases.length,
-      );
+      this.selectedBaseIndex = getNextValidIndex(this.selectedBaseIndex, availableParts.bases.length);
     },
 
-    selectPreviousBaseArm() {
-      this.selectedBaseIndex = getPreviousValidIndex(
-        this.selectedBaseIndex,
-        availableParts.bases.length,
-      );
+    selectPreviousBase() {
+      this.selectedBaseIndex = getPreviousValidIndex(this.selectedBaseIndex, availableParts.bases.length);
     },
   },
 };
@@ -262,5 +265,27 @@ export default {
   top: -25px;
   text-align: center;
   width: 100%;
+}
+.sale {
+  color: red;
+}
+.content {
+  position: relative;
+}
+.add-to-cart {
+  position: absolute;
+  right: 30px;
+  width: 220px;
+  padding: 3px;
+  font-size: 16px;
+}
+td,
+th {
+  text-align: left;
+  padding: 5px;
+  padding-right: 7px;
+}
+.cost {
+  text-align: right;
 }
 </style>
