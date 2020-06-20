@@ -1,6 +1,23 @@
 <template>
   <div class="content">
-    <button class="add-to-cart" @click="addToCart()">Add to Cart</button>
+    <div class="preview">
+      <collapsible-section>
+        <div class="preview-content">
+          <div class="top-row">
+            <img :src="selectedRobot.head.src" />
+          </div>
+          <div class="middle-row">
+            <img :src="selectedRobot.leftArm.src" class="rotate-left" />
+            <img :src="selectedRobot.torso.src" />
+            <img :src="selectedRobot.rightArm.src" class="rotate-right" />
+          </div>
+          <div class="bottom-row">
+            <img :src="selectedRobot.base.src" />
+          </div>
+        </div>
+      </collapsible-section>
+      <button class="add-to-cart" @click="addToCart()">Add to Cart</button>
+    </div>
     <div class="top-row">
       <div :class="['top', 'part', saleBorderClass]">
         <!-- <div class="robot-name">
@@ -8,16 +25,16 @@
            v-if removes the element from the dom, v-show just styles display none
           <span class="sale" v-if="selectedRobot.head.onSale">Sale!</span>
         </div> -->
-        <PartSelector position="top" :parts="availableParts.heads" />
+        <part-selector @partSelected="(part) => (selectedRobot.head = part)" position="top" :parts="availableParts.heads" />
       </div>
     </div>
     <div class="middle-row">
-      <PartSelector position="left" :parts="availableParts.arms" />
-      <PartSelector position="center" :parts="availableParts.torsos" />
-      <PartSelector position="right" :parts="availableParts.arms" />
+      <part-selector @partSelected="(part) => (selectedRobot.leftArm = part)" position="left" :parts="availableParts.arms" />
+      <part-selector @partSelected="(part) => (selectedRobot.torso = part)" position="center" :parts="availableParts.torsos" />
+      <part-selector @partSelected="(part) => (selectedRobot.rightArm = part)" position="right" :parts="availableParts.arms" />
     </div>
     <div class="bottom-row">
-      <PartSelector position="bottom" :parts="availableParts.bases" />
+      <part-selector @partSelected="(part) => (selectedRobot.base = part)" position="bottom" :parts="availableParts.bases" />
     </div>
     <div>
       <h1>Cart</h1>
@@ -43,6 +60,7 @@
 import availableParts from '../data/parts';
 import CreatedHookMixin from './created-hook-mixin';
 import PartSelector from './PartSelector.vue';
+import CollapsibleSection from '../shared/CollapsibleSection.vue';
 
 export default {
   name: 'RobotBuilder',
@@ -66,7 +84,7 @@ export default {
       },
     };
   },
-  components: { PartSelector },
+  components: { PartSelector, CollapsibleSection },
   mixins: [CreatedHookMixin],
   computed: {
     saleBorderClass() {
@@ -191,8 +209,7 @@ export default {
 }
 .add-to-cart {
   position: absolute;
-  right: 30px;
-  width: 220px;
+  width: 210px;
   padding: 3px;
   font-size: 16px;
 }
@@ -207,5 +224,26 @@ th {
 }
 .sale-border {
   border: 3px solid red;
+}
+.preview {
+  position: absolute;
+  top: -20px;
+  right: 0;
+  width: 210px;
+  height: 210px;
+  padding: 5px;
+}
+.preview-content {
+  border: 1px solid #999;
+}
+.preview img {
+  width: 50px;
+  height: 50px;
+}
+.rotate-right {
+  transform: rotate(90deg);
+}
+.rotate-left {
+  transform: rotate(-90deg);
 }
 </style>
